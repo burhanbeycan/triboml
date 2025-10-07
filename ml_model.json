@@ -1,0 +1,86 @@
+{
+  "top_descriptors": [
+    {
+      "name": "partial_charge_range",
+      "correlation": 0.310675885720204,
+      "coefficient": 0.17922428331084564
+    },
+    {
+      "name": "impact_strength",
+      "correlation": 0.2558365253497677,
+      "coefficient": 0.14868432854209077
+    },
+    {
+      "name": "solubility_parameter",
+      "correlation": 0.24630783553529212,
+      "coefficient": 0.14444032082862437
+    },
+    {
+      "name": "delocalization_index",
+      "correlation": 0.241373749783587,
+      "coefficient": 0.13276350868594836
+    },
+    {
+      "name": "tear_resistance",
+      "correlation": 0.24130047303125954,
+      "coefficient": 0.13567979446334652
+    },
+    {
+      "name": "hansen_hydrogen_bonding",
+      "correlation": 0.2380903386191092,
+      "coefficient": 0.14095656428122721
+    },
+    {
+      "name": "delocalization_energy",
+      "correlation": 0.23001370539074242,
+      "coefficient": 0.13765026152534157
+    },
+    {
+      "name": "heat_capacity",
+      "correlation": 0.22644207712762218,
+      "coefficient": 0.13098321618532735
+    },
+    {
+      "name": "aromatic_ratio",
+      "correlation": 0.22512330524354915,
+      "coefficient": 0.12945181206576017
+    },
+    {
+      "name": "num_triple_bonds",
+      "correlation": 0.22402809266452395,
+      "coefficient": 0.1400636607491577
+    },
+    {
+      "name": "carbon_ratio",
+      "correlation": 0.22236205580618365,
+      "coefficient": 0.13341649354472612
+    },
+    {
+      "name": "longest_chain",
+      "correlation": 0.22159552151892412,
+      "coefficient": 0.12840508039787632
+    },
+    {
+      "name": "electron_density_at_bond_critical_point",
+      "correlation": 0.21484834993867138,
+      "coefficient": 0.1200199851143389
+    },
+    {
+      "name": "sp3_carbon_ratio",
+      "correlation": 0.2148032313557423,
+      "coefficient": 0.12574471371879464
+    },
+    {
+      "name": "bond_order",
+      "correlation": 0.21453660407155792,
+      "coefficient": 0.12850691393554878
+    }
+  ],
+  "intercept": -49.917335207330844,
+  "mean_performance": 53.45345,
+  "model_info": {
+    "type": "Linear Regression",
+    "features": 15,
+    "training_samples": 200
+  }
+}
