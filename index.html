@@ -8,6 +8,17 @@
     <meta name="keywords" content="polymer, triboelectric, machine learning, molecular descriptors, materials science, QSAR, QSPR">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <!-- RDKit.js for SMILES visualization -->
+    <script src="https://unpkg.com/@rdkit/rdkit/dist/RDKit_minimal.js"></script>
+    <script>
+        let RDKitModule = null;
+        window.initRDKitModule().then(function(RDKit) {
+            console.log("RDKit version: " + RDKit.version());
+            RDKitModule = RDKit;
+        }).catch(() => {
+            console.error("RDKit.js failed to load.");
+        });
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -353,9 +364,8 @@
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">SMILES Notation</label>
                             <input type="text" id="smilesInput" placeholder="Enter SMILES string (e.g., C(C(F)(F)F)(C(F)(F)F))" 
-                                   class="search-box w-full" 
-                                   onkeypress="if(event.key==='Enter') predictPerformance()">
-                            <p class="text-xs text-gray-500 mt-2">Enter a valid SMILES string representing the polymer structure</p>
+                                   class="search-box w-full"                                    oninput="visualizeStructure(this.value)"
+                                   onkeypress="if(event.key===\'Enter\') predictPerformance()">                            <p class="text-xs text-gray-500 mt-2">Enter a valid SMILES string representing the polymer structure</p>
                         </div>
                         
                         <div class="mb-6">
@@ -712,21 +722,56 @@
 
         // Visualize structure
         function visualizeStructure(smiles) {
-            const structureBox = document.getElementById('structureBox');
-            structureBox.innerHTML = `
-                <div class="text-center w-full">
-                    <div class="bg-white rounded-lg p-4 mb-3">
-                        <p class="text-sm font-semibold text-gray-700 mb-2">SMILES Notation:</p>
-                        <p class="font-mono text-lg text-purple-700 break-all">${smiles}</p>
+            const structureBox = document.getElementById("structureBox");
+            if (!RDKitModule) {
+                structureBox.innerHTML = `<p class="text-red-500 text-center">RDKit.js kütüphanesi yüklenemedi. Yapı görselleştirilemiyor.</p>`;
+                return;
+            }
+
+            try {
+                const mol = RDKitModule.get_mol(smiles);
+                if (mol.is_valid()) {
+                    const svg = mol.get_svg();
+                    structureBox.innerHTML = `
+                        <div class="text-center w-full">
+                            <div class="bg-white rounded-lg p-4 mb-3">
+                                <p class="text-sm font-semibold text-gray-700 mb-2">SMILES Notasyonu:</p>
+                                <p class="font-mono text-lg text-purple-700 break-all">${smiles}</p>
+                            </div>
+                            <div class="bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg p-6">
+                                ${svg}
+                                <p class="text-sm text-gray-600 mt-3">Yapı doğrulandı</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    structureBox.innerHTML = `
+                        <div class="text-center w-full">
+                            <p class="text-red-500 text-center mb-4">Geçersiz SMILES notasyonu!</p>
+                            <p class="text-gray-400 text-center">
+                                <svg class="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Lütfen geçerli bir SMILES dizesi girin.
+                            </p>
+                        </div>
+                    `;
+                }
+                mol.delete(); // Belleği serbest bırak
+            } catch (e) {
+                console.error("RDKit görselleştirme hatası:", e);
+                structureBox.innerHTML = `
+                    <div class="text-center w-full">
+                        <p class="text-red-500 text-center mb-4">Görselleştirme hatası!</p>
+                        <p class="text-gray-400 text-center">
+                            <svg class="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Bir hata oluştu. Lütfen SMILES dizesini kontrol edin.
+                        </p>
                     </div>
-                    <div class="bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg p-6">
-                        <svg class="w-24 h-24 mx-auto text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                        </svg>
-                        <p class="text-sm text-gray-600 mt-3">Structure validated</p>
-                    </div>
-                </div>
-            `;
+                `;
+            }
         }
 
         // Predict performance
